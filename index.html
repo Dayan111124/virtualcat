@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Virtual Cat - Ciber Control</title>
+<style>
+  /* Estilos CSS mejorados para Virtual Cat */
+  :root {
+    --bg-dark: #0e0e0e;
+    --bg-panel: #1f1f1f;
+    --text-color: #eeeeee;
+    --accent-blue: #2196f3;
+    --accent-red: #e53935;
+    --accent-green: #43a047;
+    --accent-yellow: #fbc02d;
+    --border-radius: 12px;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    background: var(--bg-panel);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+
+  nav button {
+    background: #333;
+    border: none;
+    color: #fff;
+    padding: 10px 16px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    transition: background 0.3s;
+  }
+
+  nav button:hover {
+    background: var(--accent-blue);
+  }
+
+  nav button#logoutBtn {
+    background: var(--accent-red);
+  }
+
+  main {
+    padding: 30px 20px;
+    max-width: 960px;
+    margin: auto;
+    min-height: 80vh;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: var(--border-radius);
+    border: none;
+    background: var(--bg-panel);
+    color: var(--text-color);
+    box-sizing: border-box;
+    font-size: 1rem;
+  }
+
+  button.action {
+    background: var(--accent-blue);
+    border: none;
+    color: #fff;
+    padding: 12px 18px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+  }
+
+  button.action:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: var(--bg-panel);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #444;
+  }
+
+  th {
+    background: #2a2a2a;
+    text-align: left;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  ul li {
+    background: var(--bg-panel);
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: var(--border-radius);
+  }
+
+  #modules {
+    max-width: 720px;
+    margin: 20px auto;
+  }
+
+  .module {
+    border-radius: var(--border-radius);
+    margin-bottom: 16px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+  }
+
+  .paid { background-color: var(--accent-green); }
+  .not-paid { background-color: var(--accent-red); }
+  .running { background-color: var(--accent-yellow); color: #000; }
+
+  button.small {
+    padding: 6px 10px;
+    margin-left: 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  #ai-section {
+    max-width: 960px;
+    margin: 30px auto;
+    background: var(--bg-panel);
+    padding: 24px;
+    border-radius: var(--border-radius);
+  }
+
+  #ai-response {
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #111;
+    padding: 14px;
+    border-radius: var(--border-radius);
+    margin-top: 12px;
+    color: #aaffee;
+    font-family: monospace;
+  }
+</style>
+
+</head>
+<body>
+
+<header>
+  <h1>Virtual Cat</h1>
+  <nav id="nav" class="hidden">
+    <button data-panel="admin">Admin</button>
+    <button data-panel="vendedor">Vendedor</button>
+    <button data-panel="ciber">Ciber</button>
+    <button data-panel="tele">Tele</button>
+    <button id="logoutBtn">Salir</button>
+  </nav>
+</header>
+
+<main>
+  <section id="login-section" style="max-width:400px; margin: 80px auto; background:#222; padding:20px; border-radius:8px;">
+    <h2>Iniciar sesión</h2>
+    <input type="text" id="username" placeholder="Usuario" autocomplete="username" />
+    <input type="password" id="password" placeholder="Contraseña" autocomplete="current-password" />
+    <button id="loginBtn" class="action">Entrar</button>
+    <p id="login-msg" style="color:#f44336; margin-top:8px;"></p>
+  </section>
+
+  <section id="admin-panel" class="hidden">
+    <h2>Gestión de Usuarios</h2>
+    <form id="user-form">
+      <input type="text" id="new-username" placeholder="Usuario nuevo" required />
+      <input type="password" id="new-password" placeholder="Contraseña" required />
+      <select id="new-role">
+        <option value="admin">Admin</option>
+        <option value="vendedor">Vendedor</option>
+        <option value="ciber">Ciber</option>
+        <option value="tele">Tele</option>
+      </select>
+      <button type="submit" class="action">Crear Usuario</button>
+    </form>
+    <h3>Lista de Usuarios</h3>
+    <ul id="user-list"></ul>
+  </section>
+
+  <section id="vendedor-panel" class="hidden">[Contenido del panel vendedor aquí]</section>
+  <section id="ciber-panel" class="hidden">[Contenido del panel ciber aquí]</section>
+  <section id="tele-panel" class="hidden">[Contenido del panel tele aquí]</section>
+
+  <section id="ai-section" class="hidden">
+    <h2>Consulta IA (Simulada)</h2>
+    <textarea id="ai-input" rows="3" placeholder="Escribe tu pregunta o pide estrategias"></textarea>
+    <button id="ai-send" class="action">Enviar a IA</button>
+    <pre id="ai-response"></pre>
+  </section>
+</main>
+
+<script>
+  // Simulación de base de datos local para usuarios y módulos
+  let users = {
+    admin: { password: "1234", role: "admin" },
+    vendedor: { password: "1234", role: "vendedor" },
+    ciber: { password: "1422", role: "ciber" },
+    tele: { password: "1234", role: "tele" }
+  };
+
+  let modules = {
+    mod1: { name: "Módulo 1", elapsed: 0, running: false, paid: false },
+    mod2: { name: "Módulo 2", elapsed: 0, running: false, paid: false },
+    mod3: { name: "Módulo 3", elapsed: 0, running: false, paid: false }
+  };
+
+  let currentUser = null;
+  let intervalId = null;
+
+  // Elementos DOM
+  const loginSection = document.getElementById('login-section');
+  const nav = document.getElementById('nav');
+  const loginMsg = document.getElementById('login-msg');
+
+  const adminPanel = document.getElementById('admin-panel');
+  const vendedorPanel = document.getElementById('vendedor-panel');
+  const ciberPanel = document.getElementById('ciber-panel');
+  const telePanel = document.getElementById('tele-panel');
+  const aiSection = document.getElementById('ai-section');
+
+  // Login
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    if (users[u] && users[u].password === p) {
+      currentUser = { username: u, role: users[u].role };
+      showPanel(users[u].role);
+      loginMsg.textContent = '';
+    } else {
+      loginMsg.textContent = 'Credenciales incorrectas';
+    }
+  });
+
+  // Mostrar panel según rol
+  function showPanel(role) {
+    loginSection.classList.add('hidden');
+    nav.classList.remove('hidden');
+
+    [adminPanel, vendedorPanel, ciberPanel, telePanel, aiSection].forEach(panel => panel.classList.add('hidden'));
+
+    switch(role) {
+      case 'admin': adminPanel.classList.remove('hidden'); break;
+      case 'vendedor': vendedorPanel.classList.remove('hidden'); break;
+      case 'ciber': ciberPanel.classList.remove('hidden'); break;
+      case 'tele': telePanel.classList.remove('hidden'); break;
+    }
+    aiSection.classList.remove('hidden');
+  }
+
+  // Navegación entre paneles
+  nav.querySelectorAll('button[data-panel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panel = btn.getAttribute('data-panel');
+      showPanel(panel);
+    });
+  });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    currentUser = null;
+    clearInterval(intervalId);
+    location.reload();
+  });
+
+  // Render usuarios en admin
+  function renderUserList() {
+    const list = document.getElementById('user-list');
+    list.innerHTML = '';
+    Object.entries(users).forEach(([username, data]) => {
+      const li = document.createElement('li');
+      li.textContent = `${username} — ${data.role}`;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Eliminar';
+      delBtn.className = 'small';
+      delBtn.style.marginLeft = '10px';
+      delBtn.onclick = () => {
+        if (confirm(`¿Eliminar al usuario ${username}?`)) {
+          delete users[username];
+          renderUserList();
+        }
+      };
+      li.appendChild(delBtn);
+      list.appendChild(li);
+    });
+  }
+
+  renderUserList();
+
+  // Crear usuario nuevo
+  document.getElementById('user-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const username = document.getElementById('new-username').value.trim();
+    const password = document.getElementById('new-password').value.trim();
+    const role = document.getElementById('new-role').value;
+    if (username && password) {
+      if(users[username]) {
+        alert('Usuario ya existe');
+      } else {
+        users[username] = { password, role };
+        renderUserList();
+        e.target.reset();
+      }
+    }
+  });
+
+  // Render módulos para ciber panel
+  function formatDuration(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h}h ${m}m ${s}s`;
+  }
+
+  function renderModules() {
+    ciberPanel.innerHTML = '';
+    Object.entries(modules).forEach(([key, m]) => {
+      const div = document.createElement('div');
+      const statusClass = m.paid ? 'paid' : (m.running ? 'running' : 'not-paid');
+      div.className = `module ${statusClass}`;
+      div.innerHTML = `
+        <div><strong>${m.name}</strong><br/>Tiempo: ${formatDuration(m.elapsed)}</div>
+        <div>
+          <button class="small" onclick="toggleTimer('${key}')">${m.running ? 'Pausar' : 'Iniciar'}</button>
+          <button class="small" onclick="togglePaid('${key}')">${m.paid ? 'No Pagado' : 'Pagado'}</button>
+          <button class="small" onclick="resetTimer('${key}')">Resetear</button>
+        </div>
+      `;
+      ciberPanel.appendChild(div);
+    });
+  }
+
+  // Temporizador y estados
+  function toggleTimer(key) {
+    const m = modules[key];
+    if (m.running) {
+      m.running = false;
+      clearInterval(intervalId);
+      intervalId = null;
+    } else {
+      m.running = true;
+      intervalId = setInterval(() => {
+        m.elapsed++;
+        renderModules();
+      }, 1000);
+    }
+    renderModules();
+  }
+
+  function togglePaid(key) {
+    modules[key].paid = !modules[key].paid;
+    renderModules();
+  }
+
+  function resetTimer(key) {
+    modules[key].elapsed = 0;
+    modules[key].running = false;
+    modules[key].paid = false;
+    clearInterval(intervalId);
+    intervalId = null;
+    renderModules();
+  }
+
+  renderModules();
+
+  // Simulación IA
+  document.getElementById('ai-send').addEventListener('click', () => {
+    const prompt = document.getElementById('ai-input').value.trim();
+    const aiResponse = document.getElementById('ai-response');
+    aiResponse.textContent = 'Pensando...';
+
+    setTimeout(() => {
+      aiResponse.textContent = `Sugerencias para tu ciber:
+- Ofrece combos de snacks + tiempo
+- Revisa el inventario semanal
+- Automatiza promociones con IA
+- Usa estadísticas para mejorar ventas`;
+    }, 1500);
+  });
+
+</script>
+
+</body>
+</html>
